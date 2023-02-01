@@ -19,7 +19,7 @@ function love.load()
         w = 16,
         h = 16,
         animations = {
-            animation_speed = 40,
+            animation_speed = 20,
             animation_timer = 0,
             current_animation = "idle",
             current_animation_frame = 0,
@@ -51,25 +51,38 @@ end
 function love.update(dt)
     if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
         player.y = player.y - speed
-        setAnimation("walk_up")
     end
 
     if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
         player.y = player.y + speed
-        setAnimation("walk_down")
     end
 
     if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
         player.x = player.x - speed
-        setAnimation("walk_left")
     end
 
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
         player.x = player.x + speed
-        setAnimation("walk_right")
     end
     
-    updateAnimationFrame()
+    if ((love.keyboard.isDown("a") or love.keyboard.isDown("left"))
+            and (love.keyboard.isDown("d") or love.keyboard.isDown("right")))
+        or ((love.keyboard.isDown("w") or love.keyboard.isDown("up"))
+            and (love.keyboard.isDown("s") or love.keyboard.isDown("down"))) then
+        setAnimation("idle")
+    elseif love.keyboard.isDown("a") or love.keyboard.isDown("left") then
+        setAnimation("walk_left")
+    elseif love.keyboard.isDown("d") or love.keyboard.isDown("right") then
+        setAnimation("walk_right")
+    elseif love.keyboard.isDown("w") or love.keyboard.isDown("up") then
+        setAnimation("walk_up")
+    elseif love.keyboard.isDown("s") or love.keyboard.isDown("down") then
+        setAnimation("walk_down")
+    else
+        setAnimation("idle")
+    end
+    
+    updateAnimation()
 
     map:update(dt)
 end
@@ -125,20 +138,23 @@ function setAnimation(animation)
     player.animations.current_animation_frame = 0
 end
 
-function updateAnimationFrame()    
+function updateAnimation()
     local length = 0
     local playerAnimations = player.animations
+    local currentFrame = player.animations.current_animation_frame
     
-    if (playerAnimations.current_animation == "idle") then
-        return
-    elseif (playerAnimations.current_animation == "walk_up") then
-        for _ in pairs(playerAnimations.walk_up) do length = length + 1 end
-    elseif (playerAnimations.current_animation == "walk_right") then
-        for _ in pairs(playerAnimations.walk_right) do length = length + 1 end
-    elseif (playerAnimations.current_animation == "walk_down") then
-        for _ in pairs(playerAnimations.walk_down) do length = length + 1 end
-    elseif (playerAnimations.current_animation == "walk_left") then
-        for _ in pairs(playerAnimations.walk_left) do length = length + 1 end
+    -- Update animation frame
+    local count = 0
+    if playerAnimations.current_animation == "idle" then
+        count = getTableLength(playerAnimations.idle)
+    elseif playerAnimations.current_animation == "walk_up" then
+        count = getTableLength(playerAnimations.walk_up)
+    elseif playerAnimations.current_animation == "walk_right" then
+        count = getTableLength(playerAnimations.walk_right)
+    elseif playerAnimations.current_animation == "walk_down" then
+        count = getTableLength(playerAnimations.walk_down)
+    elseif playerAnimations.current_animation == "walk_left" then
+        count = getTableLength(playerAnimations.walk_left)
     end
     
     local timer = player.animations.animation_timer
@@ -146,7 +162,7 @@ function updateAnimationFrame()
         player.animations.animation_timer = 0
         
         frame = playerAnimations.current_animation_frame
-        if (frame >= length) then
+        if (frame >= count - 1) then
             player.animations.current_animation_frame = 0
         else
             player.animations.current_animation_frame = frame + 1
@@ -154,4 +170,33 @@ function updateAnimationFrame()
     else
         player.animations.animation_timer = timer + 1
     end
+    
+    -- Update animation
+    local currentFrameIndex = player.animations.current_animation_frame + 1
+    local currentFrameLocation = playerAnimations.idle[currentFrameIndex]
+    
+    if player.animations.current_animation == "walk_up" then
+        currentFrameLocation = playerAnimations.walk_up[currentFrameIndex]
+    elseif player.animations.current_animation == "walk_right" then
+        currentFrameLocation = playerAnimations.walk_right[currentFrameIndex]
+    elseif player.animations.current_animation == "walk_down" then
+        currentFrameLocation = playerAnimations.walk_down[currentFrameIndex]
+    elseif player.animations.current_animation == "walk_left" then
+        currentFrameLocation = playerAnimations.walk_left[currentFrameIndex]
+    end
+
+    -- Create animation quad
+    player.animation = love.graphics.newQuad(
+        currentFrameLocation.x * 16,
+        currentFrameLocation.y * 16,
+        16,
+        16,
+        playerSpriteSheet
+    )
+end
+
+function getTableLength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
 end
