@@ -44,6 +44,22 @@ function love.load()
             }
         }
     }
+    playerPos = {x = (window.w / 2) - (player.w / 2), y = (window.h / 2) - (player.h / 2)}
+    transform = love.math.newTransform(
+        playerPos.x,
+        playerPos.y,
+        player.r,
+        mapScale,
+        mapScale,
+        player.w / (mapScale ^ 2),
+        player.h / (mapScale ^ 2)
+    )
+    gun = {
+        bullet_speed = 4,
+        bullet_sprite = love.graphics.newImage("images/bullet.png"),
+        current_bullet_id = 0
+    }
+    bullets = {}
     player.spriteSheet:setFilter("nearest", "nearest")
     font = love.graphics.getFont()
 end
@@ -83,7 +99,7 @@ function love.update(dt)
     end
     
     updateAnimation()
-
+    updateBullets()
     map:update(dt)
 end
 
@@ -94,22 +110,32 @@ function love.draw()
         mapPos.y,
         mapScale
     )
-
-    transform = love.math.newTransform(
-        (window.w / 2) - (player.w / 2),
-        (window.h / 2) - (player.h / 2),
-        player.r,
-        mapScale,
-        mapScale,
-        player.w / (mapScale ^ 2),
-        player.h / (mapScale ^ 2)
-    )
     
     love.graphics.draw(
         player.spriteSheet,     -- Sprite
         player.animation,       -- Quad
         transform               -- Transform
     )
+    
+    for index, b in pairs(bullets) do
+        local bulletInstance = b.bullet
+        love.graphics.draw(
+            gun.bullet_sprite,
+            bulletInstance.x,
+            bulletInstance.y,
+            bulletInstance.r,
+            1,
+            1,
+            bulletInstance.w,
+            bulletInstance.h
+        )
+        
+        love.graphics.print("Id: "
+            ..tostring(b.id).. "; Timer: "
+            ..tostring(bulletInstance.destroy_timer).. "; R: "
+            ..tostring(math.deg(bulletInstance.r)), 10, 130 + (index * 20)
+        )
+    end
   
     love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
     love.graphics.print("Player position: {x: "
@@ -121,6 +147,11 @@ function love.draw()
     love.graphics.print("Current player animation: " ..player.animations.current_animation, 10, 70)
     love.graphics.print("Player animation timer: " ..tostring(player.animations.animation_timer), 10, 90)
     love.graphics.print("Player animation frame: " ..tostring(player.animations.current_animation_frame), 10, 110)
+    love.graphics.print("Bullets: " ..tostring(getTableLength(bullets)), 10, 130)
+end
+
+function love.mousepressed(x, y, button, istouch)
+    addBullet(x, y)
 end
 
 function updateMapPos()
@@ -141,7 +172,7 @@ end
 function updateAnimation()
     local length = 0
     local playerAnimations = player.animations
-    local currentFrame = player.animations.current_animation_frame
+    local currentFrame = playerAnimations.current_animation_frame
     
     -- Update animation frame
     local count = 0
@@ -158,45 +189,83 @@ function updateAnimation()
     end
     
     local timer = player.animations.animation_timer
-    if (timer > player.animations.animation_speed) then
-        player.animations.animation_timer = 0
+    if (timer > playerAnimations.animation_speed) then
+        playerAnimations.animation_timer = 0
         
         frame = playerAnimations.current_animation_frame
         if (frame >= count - 1) then
-            player.animations.current_animation_frame = 0
+            playerAnimations.current_animation_frame = 0
         else
-            player.animations.current_animation_frame = frame + 1
+            playerAnimations.current_animation_frame = frame + 1
         end
     else
-        player.animations.animation_timer = timer + 1
+        playerAnimations.animation_timer = timer + 1
     end
     
     -- Update animation
-    local currentFrameIndex = player.animations.current_animation_frame + 1
+    local currentFrameIndex = playerAnimations.current_animation_frame + 1
     local currentFrameLocation = playerAnimations.idle[currentFrameIndex]
     
-    if player.animations.current_animation == "walk_up" then
+    if playerAnimations.current_animation == "walk_up" then
         currentFrameLocation = playerAnimations.walk_up[currentFrameIndex]
-    elseif player.animations.current_animation == "walk_right" then
+    elseif playerAnimations.current_animation == "walk_right" then
         currentFrameLocation = playerAnimations.walk_right[currentFrameIndex]
-    elseif player.animations.current_animation == "walk_down" then
+    elseif playerAnimations.current_animation == "walk_down" then
         currentFrameLocation = playerAnimations.walk_down[currentFrameIndex]
-    elseif player.animations.current_animation == "walk_left" then
+    elseif playerAnimations.current_animation == "walk_left" then
         currentFrameLocation = playerAnimations.walk_left[currentFrameIndex]
     end
 
     -- Create animation quad
     player.animation = love.graphics.newQuad(
-        currentFrameLocation.x * 16,
-        currentFrameLocation.y * 16,
-        16,
-        16,
+        currentFrameLocation.x * player.w,
+        currentFrameLocation.y * player.h,
+        player.w,
+        player.h,
         playerSpriteSheet
     )
 end
 
+function updateBullets()
+    if getTableLength(bullets) == 0 then
+        return
+    end
+    
+    for index, b in pairs(bullets) do
+        local bulletInstance = b.bullet
+        bulletInstance.x = bulletInstance.x + gun.bullet_speed
+        bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
+        
+        if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
+            table.remove(bullets, index)
+        end
+    end
+end
+
+function addBullet(x, y)
+    local delta = {
+        x = playerPos.x - x,
+        y = playerPos.y - y
+    }
+    
+    table.insert(bullets, {
+        id = gun.current_bullet_id,
+        bullet = {
+            x = (window.w / 2) + 20,
+            y = window.h / 2 + 3,
+            r = -math.atan2(delta.x, delta.y) - math.rad(90),
+            w = 20,
+            h = 3,
+            destroy_timer_limit = 150,
+            destroy_timer = 0
+        }
+    })
+
+    gun.current_bullet_id = gun.current_bullet_id + 1
+end
+
 function getTableLength(T)
-  local count = 0
-  for _ in pairs(T) do count = count + 1 end
-  return count
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
 end
