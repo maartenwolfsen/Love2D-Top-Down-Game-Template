@@ -1,21 +1,31 @@
 ﻿local sti = require "lib/sti"
+debug = true
 
 function love.load()
     map = sti("maps/arena1.lua")
     mapPos = {x = 0, y = 0}
-    speed = 0.5
-    mapScale = 4
     window = {
         w = love.graphics.getWidth(),
         h = love.graphics.getHeight()
     }
     playerSpriteSheet = love.graphics.newImage("images/player_spritesheet.png")
+    camera = {
+        x = 0,
+        y = 0,
+        r = 0,
+        scale = 4,
+        minScale = 4,
+        zoom = 0,
+        minZoom = 0,
+        maxZoom = 1,
+        zoomSpeed = 0.02,
+        speed = 0.5
+    }
     player = {
         spriteSheet = playerSpriteSheet,
         animation = love.graphics.newQuad(0, 0, 16, 16, playerSpriteSheet),
         x = 0,
         y = 0,
-        r = 0,
         w = 16,
         h = 16,
         animations = {
@@ -44,16 +54,6 @@ function love.load()
             }
         }
     }
-    playerPos = {x = (window.w / 2) - (player.w / 2), y = (window.h / 2) - (player.h / 2)}
-    transform = love.math.newTransform(
-        playerPos.x,
-        playerPos.y,
-        player.r,
-        mapScale,
-        mapScale,
-        player.w / (mapScale ^ 2),
-        player.h / (mapScale ^ 2)
-    )
     gun = {
         bullet_speed = 4,
         bullet_sprite = love.graphics.newImage("images/bullet.png"),
@@ -67,19 +67,19 @@ end
 
 function love.update(dt)
     if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-        player.y = player.y - speed
+        camera.y = camera.y - camera.speed
     end
 
     if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
-        player.y = player.y + speed
+        camera.y = camera.y + camera.speed
     end
 
     if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-        player.x = player.x - speed
+        camera.x = camera.x - camera.speed
     end
 
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-        player.x = player.x + speed
+        camera.x = camera.x + camera.speed
     end
     
     if ((love.keyboard.isDown("a") or love.keyboard.isDown("left"))
@@ -99,6 +99,18 @@ function love.update(dt)
         setAnimation("idle")
     end
     
+	if love.mouse.isDown(2) then
+        if camera.zoom < camera.maxZoom then
+            camera.zoom = camera.zoom + camera.zoomSpeed
+            camera.scale = camera.minScale + camera.zoom
+        end
+    else
+        if camera.zoom > camera.minZoom then
+            camera.zoom = camera.zoom - camera.zoomSpeed
+            camera.scale = camera.minScale + camera.zoom
+        end
+    end
+    
     updateAnimation()
     updateBullets()
     map:update(dt)
@@ -109,7 +121,17 @@ function love.draw()
     map:draw(
         mapPos.x,
         mapPos.y,
-        mapScale
+        camera.scale
+    )
+    
+    transform = love.math.newTransform(
+        player.x,
+        player.y,
+        camera.r,
+        camera.scale,
+        camera.scale,
+        player.w / (camera.scale ^ 2),
+        player.h / (camera.scale ^ 2)
     )
     
     love.graphics.draw(
@@ -118,6 +140,8 @@ function love.draw()
         transform               -- Transform
     )
     
+    updatePlayerPos()
+
     for index, b in pairs(bullets) do
         local bulletInstance = b.bullet
         love.graphics.draw(
@@ -131,33 +155,48 @@ function love.draw()
             bulletInstance.h
         )
         
-        love.graphics.print("  - Id: "
-            ..tostring(b.id).. "; Timer: "
-            ..tostring(bulletInstance.destroy_timer).. "; R: "
-            ..tostring(math.floor(math.deg(bulletInstance.r))), 10, 130 + (index * 20)
-        )
+        if debug then
+            love.graphics.print("  - Id: "
+                ..tostring(b.id).. "; Timer: "
+                ..tostring(bulletInstance.destroy_timer).. "; R: "
+                ..tostring(math.floor(math.deg(bulletInstance.r))), 10, 110 + (index * 20)
+            )
+        end
     end
   
-    love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
-    love.graphics.print("Player position: {x: "
-        ..tostring(math.floor(player.x)).. "; y: "
-        ..tostring(math.floor(player.y)).. "}", 10, 30)
-    love.graphics.print("Map position: {x: "
-        ..tostring(math.floor(mapPos.x)).. "; y: "
-        ..tostring(math.floor(mapPos.y)).. "}", 10, 50)
-    love.graphics.print("Current player animation: " ..player.animations.current_animation, 10, 70)
-    love.graphics.print("Player animation timer: " ..tostring(player.animations.animation_timer), 10, 90)
-    love.graphics.print("Player animation frame: " ..tostring(player.animations.current_animation_frame), 10, 110)
-    love.graphics.print("Bullets: " ..tostring(getTableLength(bullets)), 10, 130)
+    if debug then
+        love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
+        love.graphics.print("Player position: {x: "
+            ..tostring(math.floor(camera.x)).. "; y: "
+            ..tostring(math.floor(camera.y)).. "}", 10, 30)
+        love.graphics.print("Map position: {x: "
+            ..tostring(math.floor(mapPos.x)).. "; y: "
+            ..tostring(math.floor(mapPos.y)).. "}", 10, 50)
+        love.graphics.print("Animation | Anim: "
+            ..player.animations.current_animation.. "; Timer: "
+            ..tostring(player.animations.animation_timer).. "; Frame: "
+            ..tostring(player.animations.current_animation_frame), 10, 70)
+        love.graphics.print("Camera | Scale: " ..tostring(camera.scale), 10, 90)
+        love.graphics.print("Bullets: " ..tostring(getTableLength(bullets)), 10, 110)
+    end
 end
 
 function love.mousepressed(x, y, button, istouch)
+    if button ~= 1 then
+        return
+    end
+    
     addBullet(x, y)
 end
 
 function updateMapPos()
-    mapPos.x = -player.x + ((window.w / mapScale / 2) - (player.w * (mapScale * 2)))
-    mapPos.y = -player.y + ((window.h / mapScale / 2) - (player.h * (mapScale * 2)))
+    mapPos.x = -camera.x + ((window.w / camera.scale / 2))
+    mapPos.y = -camera.y + ((window.h / camera.scale / 2))
+end
+
+function updatePlayerPos()
+    player.x = (window.w / 2) - ((player.w * camera.scale) / 2)
+    player.y = (window.h / 2) - ((player.h * camera.scale) / 2)
 end
 
 function setAnimation(animation)
@@ -247,8 +286,8 @@ end
 
 function addBullet(x, y)
     local delta = {
-        x = playerPos.x - x,
-        y = playerPos.y - y
+        x = player.x - x,
+        y = player.y - y
     }
     
     table.insert(bullets, {
