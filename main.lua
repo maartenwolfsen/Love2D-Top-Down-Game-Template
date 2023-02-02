@@ -62,6 +62,7 @@ function love.load()
     bullets = {}
     player.spriteSheet:setFilter("nearest", "nearest")
     font = love.graphics.getFont()
+    sfxLaser = love.audio.newSource("sfx/laserShoot.wav", "static")
 end
 
 function love.update(dt)
@@ -123,17 +124,17 @@ function love.draw()
             gun.bullet_sprite,
             bulletInstance.x,
             bulletInstance.y,
-            bulletInstance.r,
+            -bulletInstance.r,
             1,
             1,
             bulletInstance.w,
             bulletInstance.h
         )
         
-        love.graphics.print("Id: "
+        love.graphics.print("  - Id: "
             ..tostring(b.id).. "; Timer: "
             ..tostring(bulletInstance.destroy_timer).. "; R: "
-            ..tostring(math.deg(bulletInstance.r)), 10, 130 + (index * 20)
+            ..tostring(math.floor(math.deg(bulletInstance.r))), 10, 130 + (index * 20)
         )
     end
   
@@ -233,7 +234,9 @@ function updateBullets()
     
     for index, b in pairs(bullets) do
         local bulletInstance = b.bullet
-        bulletInstance.x = bulletInstance.x + gun.bullet_speed
+        bulletInstance.x = bulletInstance.x + -math.sin(bulletInstance.r) * gun.bullet_speed
+        bulletInstance.y = bulletInstance.y + -math.cos(bulletInstance.r) * gun.bullet_speed
+        
         bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
         
         if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
@@ -253,7 +256,7 @@ function addBullet(x, y)
         bullet = {
             x = (window.w / 2) + 20,
             y = window.h / 2 + 3,
-            r = -math.atan2(delta.x, delta.y) - math.rad(90),
+            r = math.atan2(delta.x, delta.y),
             w = 20,
             h = 3,
             destroy_timer_limit = 150,
@@ -262,6 +265,7 @@ function addBullet(x, y)
     })
 
     gun.current_bullet_id = gun.current_bullet_id + 1
+    sfxLaser:play()
 end
 
 function getTableLength(T)
