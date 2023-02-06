@@ -57,7 +57,10 @@ function love.load()
     gun = {
         bullet_speed = 4,
         bullet_sprite = love.graphics.newImage("images/bullet.png"),
-        current_bullet_id = 0
+        current_bullet_id = 0,
+        shoot_speed = 30,
+        shoot_timer = 0,
+        can_shoot = true
     }
     bullets = {}
     player.spriteSheet:setFilter("nearest", "nearest")
@@ -186,7 +189,9 @@ function love.mousepressed(x, y, button, istouch)
         return
     end
     
-    addBullet(x, y)
+    if gun.can_shoot then
+        shoot(x, y)
+    end
 end
 
 function updateMapPos()
@@ -273,8 +278,11 @@ function updateBullets()
     
     for index, b in pairs(bullets) do
         local bulletInstance = b.bullet
-        bulletInstance.x = bulletInstance.x + -math.sin(bulletInstance.r) * gun.bullet_speed
-        bulletInstance.y = bulletInstance.y + -math.cos(bulletInstance.r) * gun.bullet_speed
+        local x = bulletInstance.x + -math.sin(bulletInstance.r) * gun.bullet_speed
+        local y = bulletInstance.y + -math.cos(bulletInstance.r) * gun.bullet_speed
+        bulletInstance.x = x
+        bulletInstance.y = y
+
         
         bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
         
@@ -282,9 +290,18 @@ function updateBullets()
             table.remove(bullets, index)
         end
     end
+    
+    if gun.can_shoot == false then
+        if gun.shoot_timer > gun.shoot_speed then
+            gun.can_shoot = true
+            gun.shoot_timer = 0
+        else
+            gun.shoot_timer = gun.shoot_timer + 1
+        end
+    end
 end
 
-function addBullet(x, y)
+function shoot(x, y)
     local delta = {
         x = player.x - x,
         y = player.y - y
@@ -293,8 +310,8 @@ function addBullet(x, y)
     table.insert(bullets, {
         id = gun.current_bullet_id,
         bullet = {
-            x = (window.w / 2) + 20,
-            y = window.h / 2 + 3,
+            x = player.x + (player.w * camera.scale / 2),
+            y = player.y + (player.h * camera.scale / 2),
             r = math.atan2(delta.x, delta.y),
             w = 20,
             h = 3,
@@ -304,7 +321,8 @@ function addBullet(x, y)
     })
 
     gun.current_bullet_id = gun.current_bullet_id + 1
-    sfxLaser:play()
+    gun.can_shoot = false
+    love.audio.play(sfxLaser)
 end
 
 function getTableLength(T)
