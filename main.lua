@@ -21,6 +21,9 @@ function love.load()
         zoomSpeed = 0.02,
         speed = 0.5
     }
+    
+    initMap()
+    
     player = {
         spriteSheet = playerSpriteSheet,
         animation = love.graphics.newQuad(0, 0, 16, 16, playerSpriteSheet),
@@ -114,13 +117,14 @@ function love.update(dt)
         end
     end
     
+    updateMapPos()
+    updatePlayerPos()
     updateAnimation()
     updateBullets()
     map:update(dt)
 end
 
-function love.draw()
-    updateMapPos()
+function love.draw()    
     map:draw(
         mapPos.x,
         mapPos.y,
@@ -142,8 +146,6 @@ function love.draw()
         player.animation,       -- Quad
         transform               -- Transform
     )
-    
-    updatePlayerPos()
 
     for index, b in pairs(bullets) do
         local bulletInstance = b.bullet
@@ -191,6 +193,23 @@ function love.mousepressed(x, y, button, istouch)
     
     if gun.can_shoot then
         shoot(x, y)
+    end
+end
+
+function initMap()
+    for index, layer in pairs(map.layers) do
+        if layer.type == "objectgroup" then
+            if layer.name == "Spawners" then
+                for objIndex, object in pairs(layer.objects) do
+                    if object.name == "player" then
+                        camera.x = object.x
+                        camera.y = object.y
+                    end
+                end
+            end
+            
+            map:removeLayer(index)
+        end
     end
 end
 
