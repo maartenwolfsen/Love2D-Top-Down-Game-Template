@@ -214,7 +214,6 @@ end
 function initMap()
     for index, layer in pairs(map.layers) do
         if layer.type == "objectgroup" then
-            print(layer.name)
             if layer.name == "Spawners" then
                 for objIndex, object in pairs(layer.objects) do
                     if object.name == "player" then
