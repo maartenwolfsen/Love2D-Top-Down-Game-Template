@@ -21,6 +21,7 @@ function love.load()
         zoomSpeed = 0.02,
         speed = 0.5
     }
+    colliders = {}
     
     initMap()
     
@@ -72,21 +73,35 @@ function love.load()
 end
 
 function love.update(dt)
+    newPos = {
+        x = camera.x,
+        y = camera.y,
+        w = player.w,
+        h = player.h
+    }
+    
     if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-        camera.y = camera.y - camera.speed
+        newPos.y = camera.y - camera.speed
     end
 
     if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
-        camera.y = camera.y + camera.speed
+        newPos.y = camera.y + camera.speed
     end
 
     if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-        camera.x = camera.x - camera.speed
+        newPos.x = camera.x - camera.speed
     end
 
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-        camera.x = camera.x + camera.speed
+        newPos.x = camera.x + camera.speed
     end
+    
+    if isColliding(newPos) then
+        print("Colliding!")
+    end
+    
+    camera.x = newPos.x
+    camera.y = newPos.y
     
     if ((love.keyboard.isDown("a") or love.keyboard.isDown("left"))
             and (love.keyboard.isDown("d") or love.keyboard.isDown("right")))
@@ -199,6 +214,7 @@ end
 function initMap()
     for index, layer in pairs(map.layers) do
         if layer.type == "objectgroup" then
+            print(layer.name)
             if layer.name == "Spawners" then
                 for objIndex, object in pairs(layer.objects) do
                     if object.name == "player" then
@@ -206,11 +222,33 @@ function initMap()
                         camera.y = object.y
                     end
                 end
+            elseif layer.name == "Colliders" then
+                for objIndex, object in pairs(layer.objects) do
+                    table.insert(colliders, {
+                        x = object.x,
+                        y = object.y,
+                        w = object.width,
+                        h = object.height
+                    })
+                end
             end
             
             map:removeLayer(index)
         end
     end
+end
+
+function isColliding(object)
+    for index, collider in pairs(colliders) do
+        if object.x >= collider.x
+            and collider.x <= collider.x + collider.w
+            and collider.y >= collider.y
+            and collider.y <= collider.height then
+            return true
+        end
+    end
+    
+    return false
 end
 
 function updateMapPos()

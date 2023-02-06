@@ -8,8 +8,8 @@ return {
   height = 30,
   tilewidth = 16,
   tileheight = 16,
-  nextlayerid = 5,
-  nextobjectid = 12,
+  nextlayerid = 6,
+  nextobjectid = 17,
   backgroundcolor = { 36, 48, 54 },
   properties = {},
   tilesets = {
@@ -156,13 +156,80 @@ return {
       objects = {
         {
           id = 11,
-          name = "player",
+          name = "Player",
           type = "",
           shape = "point",
           x = 232.333,
           y = 231.333,
           width = 0,
           height = 0,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 5,
+      name = "Colliders",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
+        {
+          id = 12,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 128,
+          y = 128,
+          width = 16,
+          height = 240,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 14,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 144,
+          y = 128,
+          width = 192,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 15,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 336,
+          y = 128,
+          width = 16,
+          height = 240,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 16,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 144,
+          y = 352,
+          width = 192,
+          height = 16,
           rotation = 0,
           visible = true,
           properties = {}
