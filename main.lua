@@ -1,4 +1,5 @@
 ﻿local sti = require "lib/sti"
+local colliders = require "src/colliders"
 debug = true
 
 function love.load()
@@ -21,7 +22,6 @@ function love.load()
         zoomSpeed = 0.02,
         speed = 0.5
     }
-    colliders = {}
     
     initMap()
     
@@ -96,12 +96,10 @@ function love.update(dt)
         newPos.x = camera.x + camera.speed
     end
     
-    if isColliding(newPos) then
-        print("Colliding!")
+    if not colliders.isColliding(newPos) then
+        camera.x = newPos.x
+        camera.y = newPos.y
     end
-    
-    camera.x = newPos.x
-    camera.y = newPos.y
     
     if ((love.keyboard.isDown("a") or love.keyboard.isDown("left"))
             and (love.keyboard.isDown("d") or love.keyboard.isDown("right")))
@@ -120,7 +118,7 @@ function love.update(dt)
         setAnimation("idle")
     end
     
-	if love.mouse.isDown(2) then
+    if love.mouse.isDown(2) then
         if camera.zoom < camera.maxZoom then
             camera.zoom = camera.zoom + camera.zoomSpeed
             camera.scale = camera.minScale + camera.zoom
@@ -216,14 +214,14 @@ function initMap()
         if layer.type == "objectgroup" then
             if layer.name == "Spawners" then
                 for objIndex, object in pairs(layer.objects) do
-                    if object.name == "player" then
+                    if object.name == "Player" then
                         camera.x = object.x
                         camera.y = object.y
                     end
                 end
             elseif layer.name == "Colliders" then
                 for objIndex, object in pairs(layer.objects) do
-                    table.insert(colliders, {
+                    colliders.add({
                         x = object.x,
                         y = object.y,
                         w = object.width,
@@ -235,19 +233,6 @@ function initMap()
             map:removeLayer(index)
         end
     end
-end
-
-function isColliding(object)
-    for index, collider in pairs(colliders) do
-        if object.x >= collider.x
-            and collider.x <= collider.x + collider.w
-            and collider.y >= collider.y
-            and collider.y <= collider.height then
-            return true
-        end
-    end
-    
-    return false
 end
 
 function updateMapPos()
