@@ -38,4 +38,12 @@ Map.init = function()
     end
 end
 
+Map.draw = function()
+    Map.object:draw(
+        Camera.offset.x,
+        Camera.offset.y,
+        Camera.scale
+    )
+end
+
 return Map

@@ -32,11 +32,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    Map.object:draw(
-        Camera.offset.x,
-        Camera.offset.y,
-        Camera.scale
-    )
+    Map.draw()
     Bullets.draw()
     Enemies.draw()
     Player.draw()

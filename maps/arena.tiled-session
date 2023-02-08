@@ -3,11 +3,22 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "arena1.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "Alle Bestanden (*)",
     "fileStates": {
+        "arena1.tmx": {
+            "scale": 3,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 276.3333333333333,
+                "y": 269.33333333333337
+            }
+        },
+        "arena1.tmx#grounds": {
+            "scaleInDock": 1
+        }
     },
     "last.exportedFilePath": "D:/Project/lua/killabot/maps",
     "last.imagePath": "D:/Project/lua/killabot/images/tilesets",
@@ -17,10 +28,12 @@
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
+        "arena1.tmx"
     ],
     "project": "arena.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "arena1.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.lastUsedFormat": "tsx",
