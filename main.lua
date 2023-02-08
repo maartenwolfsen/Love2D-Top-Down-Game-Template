@@ -1,10 +1,12 @@
 ﻿local sti = require "lib/sti"
 local colliders = require "src/colliders"
+local enemies = require "src/enemies"
+local bullets = require "src/bullets"
 debug = true
 
 function love.load()
     map = sti("maps/arena1.lua")
-    mapPos = {x = 0, y = 0}
+    
     window = {
         w = love.graphics.getWidth(),
         h = love.graphics.getHeight()
@@ -20,7 +22,11 @@ function love.load()
         minZoom = 0,
         maxZoom = 1,
         zoomSpeed = 0.02,
-        speed = 0.5
+        speed = 0.5,
+        offset = {
+            x = 0,
+            y = 0
+        }
     }
     
     initMap()
@@ -58,18 +64,9 @@ function love.load()
             }
         }
     }
-    gun = {
-        bullet_speed = 4,
-        bullet_sprite = love.graphics.newImage("images/bullet.png"),
-        current_bullet_id = 0,
-        shoot_speed = 30,
-        shoot_timer = 0,
-        can_shoot = true
-    }
     bullets = {}
     player.spriteSheet:setFilter("nearest", "nearest")
     font = love.graphics.getFont()
-    sfxLaser = love.audio.newSource("sfx/laserShoot.wav", "static")
 end
 
 function love.update(dt)
@@ -130,17 +127,32 @@ function love.update(dt)
         end
     end
     
-    updateMapPos()
+    if Enemies.spawners.spawn
+        and Enemies.spawners.spawnTimer < Enemies.spawners.spawnSpeed then
+        Enemies.spawners.spawnTimer = Enemies.spawners.spawnTimer + 1
+    else
+        enemiesSize = 0
+        for _ in pairs(Enemies.objects) do enemiesSize = enemiesSize + 1 end
+        if enemiesSize < Enemies.spawners.maxEnemies then
+            Enemies.spawn()
+            Enemies.spawners.spawnTimer = 0
+        else
+            Enemies.spawners.spawn = false
+        end
+    end
+
+    updateCameraOffset()
     updatePlayerPos()
+    Enemies.update(camera)
     updateAnimation()
-    updateBullets()
+    Bullets.update()
     map:update(dt)
 end
 
 function love.draw()    
     map:draw(
-        mapPos.x,
-        mapPos.y,
+        camera.offset.x,
+        camera.offset.y,
         camera.scale
     )
     
@@ -160,27 +172,8 @@ function love.draw()
         transform               -- Transform
     )
 
-    for index, b in pairs(bullets) do
-        local bulletInstance = b.bullet
-        love.graphics.draw(
-            gun.bullet_sprite,
-            bulletInstance.x,
-            bulletInstance.y,
-            -bulletInstance.r,
-            1,
-            1,
-            bulletInstance.w,
-            bulletInstance.h
-        )
-        
-        if debug then
-            love.graphics.print("  - Id: "
-                ..tostring(b.id).. "; Timer: "
-                ..tostring(bulletInstance.destroy_timer).. "; R: "
-                ..tostring(math.floor(math.deg(bulletInstance.r))), 10, 110 + (index * 20)
-            )
-        end
-    end
+    Bullets.draw()
+    Enemies.draw(camera)
   
     if debug then
         love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
@@ -188,24 +181,74 @@ function love.draw()
             ..tostring(math.floor(camera.x)).. "; y: "
             ..tostring(math.floor(camera.y)).. "}", 10, 30)
         love.graphics.print("Map position: {x: "
-            ..tostring(math.floor(mapPos.x)).. "; y: "
-            ..tostring(math.floor(mapPos.y)).. "}", 10, 50)
+            ..tostring(math.floor(camera.offset.x)).. "; y: "
+            ..tostring(math.floor(camera.offset.y)).. "}", 10, 50)
         love.graphics.print("Animation | Anim: "
             ..player.animations.current_animation.. "; Timer: "
             ..tostring(player.animations.animation_timer).. "; Frame: "
             ..tostring(player.animations.current_animation_frame), 10, 70)
         love.graphics.print("Camera | Scale: " ..tostring(camera.scale), 10, 90)
-        love.graphics.print("Bullets: " ..tostring(getTableLength(bullets)), 10, 110)
+        enemiesSize = 0
+        for _ in pairs(Enemies.objects) do enemiesSize = enemiesSize + 1 end
+        love.graphics.print("Enemies | Timer: "
+            ..tostring(enemies.spawners.spawnTimer).. "; Enemies: "
+            ..tostring(enemiesSize), 10, 110)
+        love.graphics.print("Bullets: " ..tostring(getTableLength(bullets)), 10, 130)
     end
 end
+
+-- function love.run()
+--     if love.math then
+--         love.math.setRandomSeed(os.time())
+--     end
+
+--     if love.load then love.load(arg) end
+
+--     local previous = love.timer.getTime()
+--     local lag = 0.0
+--     while true do
+--         local current = love.timer.getTime()
+--         local elapsed = current - previous
+--         previous = current
+--         lag = lag + elapsed
+
+--         if love.event then
+--             love.event.pump()
+--             for name, a,b,c,d,e,f in love.event.poll() do
+--                 if name == "quit" then
+--                     if not love.quit or not love.quit() then
+--                         return a
+--                     end
+--                 end
+--                 love.handlers[name](a,b,c,d,e,f)
+--             end
+--         end
+
+--         while lag >= TICKRATE do
+--             if love.update then love.update(TICKRATE) end
+--             lag = lag - TICKRATE
+--         end
+
+--         if love.graphics and love.graphics.isActive() then
+--             love.graphics.clear(love.graphics.getBackgroundColor())
+--             love.graphics.origin()
+--             if love.draw then love.draw(lag / TICKRATE) end
+--             love.graphics.present()
+--         end
+--     end
+-- end
 
 function love.mousepressed(x, y, button, istouch)
     if button ~= 1 then
         return
     end
     
-    if gun.can_shoot then
-        shoot(x, y)
+    if Bullets.gun.can_shoot then
+        Bullets.shoot(
+            camera,
+            {x = player.x, y = player.y},
+            {x = x, y = y}
+        )
     end
 end
 
@@ -217,6 +260,11 @@ function initMap()
                     if object.name == "Player" then
                         camera.x = object.x
                         camera.y = object.y
+                    elseif object.name == "Enemy" then
+                        enemies.addSpawner({
+                            x = object.x,
+                            y = object.y
+                        })
                     end
                 end
             elseif layer.name == "Colliders" then
@@ -235,9 +283,9 @@ function initMap()
     end
 end
 
-function updateMapPos()
-    mapPos.x = -camera.x + ((window.w / camera.scale / 2))
-    mapPos.y = -camera.y + ((window.h / camera.scale / 2))
+function updateCameraOffset()
+    camera.offset.x = -camera.x + window.w / camera.scale / 2
+    camera.offset.y = -camera.y + window.h / camera.scale / 2
 end
 
 function updatePlayerPos()
@@ -310,60 +358,6 @@ function updateAnimation()
         player.h,
         playerSpriteSheet
     )
-end
-
-function updateBullets()
-    if getTableLength(bullets) == 0 then
-        return
-    end
-    
-    for index, b in pairs(bullets) do
-        local bulletInstance = b.bullet
-        local x = bulletInstance.x + -math.sin(bulletInstance.r) * gun.bullet_speed
-        local y = bulletInstance.y + -math.cos(bulletInstance.r) * gun.bullet_speed
-        bulletInstance.x = x
-        bulletInstance.y = y
-
-        
-        bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
-        
-        if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
-            table.remove(bullets, index)
-        end
-    end
-    
-    if gun.can_shoot == false then
-        if gun.shoot_timer > gun.shoot_speed then
-            gun.can_shoot = true
-            gun.shoot_timer = 0
-        else
-            gun.shoot_timer = gun.shoot_timer + 1
-        end
-    end
-end
-
-function shoot(x, y)
-    local delta = {
-        x = player.x - x,
-        y = player.y - y
-    }
-    
-    table.insert(bullets, {
-        id = gun.current_bullet_id,
-        bullet = {
-            x = player.x + (player.w * camera.scale / 2),
-            y = player.y + (player.h * camera.scale / 2),
-            r = math.atan2(delta.x, delta.y),
-            w = 20,
-            h = 3,
-            destroy_timer_limit = 150,
-            destroy_timer = 0
-        }
-    })
-
-    gun.current_bullet_id = gun.current_bullet_id + 1
-    gun.can_shoot = false
-    love.audio.play(sfxLaser)
 end
 
 function getTableLength(T)
