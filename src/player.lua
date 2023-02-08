@@ -1,4 +1,5 @@
 require "src/func"
+require "src/camera"
 
 Player = {
     spriteSheet = love.graphics.newImage("images/player_spritesheet.png"),
@@ -35,15 +36,15 @@ Player = {
 Player.animation = love.graphics.newQuad(0, 0, 16, 16, Player.spriteSheet)
 Player.spriteSheet:setFilter("nearest", "nearest")
 
-Player.draw = function(camera)
+Player.draw = function()
     transform = love.math.newTransform(
         Player.x,
         Player.y,
-        camera.r,
-        camera.scale,
-        camera.scale,
-        Player.w / (camera.scale ^ 2),
-        Player.h / (camera.scale ^ 2)
+        Camera.r,
+        Camera.scale,
+        Camera.scale,
+        Player.w / (Camera.scale ^ 2),
+        Player.h / (Camera.scale ^ 2)
     )
     
     love.graphics.draw(
@@ -53,9 +54,9 @@ Player.draw = function(camera)
     )
 end
 
-Player.update = function(camera)
-    Player.x = (window.w / 2) - ((Player.w * camera.scale) / 2)
-    Player.y = (window.h / 2) - ((Player.h * camera.scale) / 2)
+Player.update = function()
+    Player.x = (window.w / 2) - ((Player.w * Camera.scale) / 2)
+    Player.y = (window.h / 2) - ((Player.h * Camera.scale) / 2)
 
     Player.updateAnimation()
 end
@@ -64,6 +65,24 @@ Player.updateAnimation = function()
 	local length = 0
     local playerAnimations = Player.animations
     local currentFrame = playerAnimations.current_animation_frame
+
+    -- Update animation
+    if ((love.keyboard.isDown("a") or love.keyboard.isDown("left"))
+            and (love.keyboard.isDown("d") or love.keyboard.isDown("right")))
+        or ((love.keyboard.isDown("w") or love.keyboard.isDown("up"))
+            and (love.keyboard.isDown("s") or love.keyboard.isDown("down"))) then
+        Player.setAnimation("idle")
+    elseif love.keyboard.isDown("a") or love.keyboard.isDown("left") then
+        Player.setAnimation("walk_left")
+    elseif love.keyboard.isDown("d") or love.keyboard.isDown("right") then
+        Player.setAnimation("walk_right")
+    elseif love.keyboard.isDown("w") or love.keyboard.isDown("up") then
+        Player.setAnimation("walk_up")
+    elseif love.keyboard.isDown("s") or love.keyboard.isDown("down") then
+        Player.setAnimation("walk_down")
+    else
+        Player.setAnimation("idle")
+    end
     
     -- Update animation frame
     local count = 0

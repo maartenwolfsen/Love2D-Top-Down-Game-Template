@@ -1,3 +1,5 @@
+require "src/camera"
+
 Enemies = {}
 
 Enemies.objects = {}
@@ -75,17 +77,17 @@ Enemies.getRandomSpawner = function()
 	return Enemies.spawners[math.random(#Enemies.spawners)]
 end
 
-Enemies.draw = function(camera)
+Enemies.draw = function()
     for index, e in pairs(Enemies.objects) do        
         love.graphics.draw(
             e.spritesheet,
             e.animation,
             love.math.newTransform(
-                camera.offset.x - e.transform.x,
-                camera.offset.y - e.transform.y,
+                Camera.offset.x - e.transform.x,
+                Camera.offset.y - e.transform.y,
                 e.transform.r,
-                camera.scale,
-                camera.scale,
+                Camera.scale,
+                Camera.scale,
                 e.transform.w,
                 e.transform.h
             )
@@ -93,7 +95,21 @@ Enemies.draw = function(camera)
     end
 end
 
-Enemies.update = function(camera)
+Enemies.update = function()
+    if Enemies.spawners.spawn
+        and Enemies.spawners.spawnTimer < Enemies.spawners.spawnSpeed then
+        Enemies.spawners.spawnTimer = Enemies.spawners.spawnTimer + 1
+    else
+        enemiesSize = 0
+        for _ in pairs(Enemies.objects) do enemiesSize = enemiesSize + 1 end
+        if enemiesSize < Enemies.spawners.maxEnemies then
+            Enemies.spawn()
+            Enemies.spawners.spawnTimer = 0
+        else
+            Enemies.spawners.spawn = false
+        end
+    end
+
     for index, e in pairs(Enemies.objects) do
     end
 end
