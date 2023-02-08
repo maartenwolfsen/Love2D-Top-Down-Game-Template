@@ -46,10 +46,10 @@ Bullets.draw = function()
     end
 end
 
-Bullets.shoot = function(camera, playerPos, mousePos)
+Bullets.shoot = function(camera, player, mousePos)
     local delta = {
-        x = playerPos.x - mousePos.x,
-        y = playerPos.y - mousePos.y
+        x = player.x - mousePos.x,
+        y = player.y - mousePos.y
     }
     
     Bullets.add({
