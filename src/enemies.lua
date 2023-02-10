@@ -48,6 +48,10 @@ Enemies.types.enemy1.animation = love.graphics.newQuad(
 )
 Enemies.types.enemy1.spritesheet:setFilter("nearest", "nearest")
 
+Map.object:addCustomLayer("Enemies", 3)
+Map.layers.enemies = Map.object.layers["Enemies"]
+Map.layers.enemies.sprites = {}
+
 Enemies.addSpawner = function(spawner)
 	table.insert(
 		Enemies.spawners,
@@ -62,7 +66,7 @@ Enemies.spawn = function()
 	e.transform.x = spawner.x
 	e.transform.y = spawner.y
 	
-	Map.addEnemy({
+	Enemies.addEnemy({
         image = e.spritesheet,
         animation = e.animation,
         transform = {
@@ -72,6 +76,13 @@ Enemies.spawn = function()
             h = e.transform.h
         }
 	})
+end
+
+Enemies.addEnemy = function(enemy)
+    table.insert(
+        Map.layers.enemies.sprites,
+        enemy
+    )
 end
 
 Enemies.getRandomSpawner = function()
@@ -91,6 +102,30 @@ Enemies.update = function()
         else
             Enemies.spawners.spawn = false
         end
+    end
+end
+
+
+function Map.layers.enemies:update(dt)
+    for _, sprite in pairs(self.sprites) do
+    end
+end
+
+function Map.layers.enemies:draw()
+    for _, sprite in pairs(self.sprites) do
+        love.graphics.draw(
+            sprite.image,
+            sprite.animation,
+            love.math.newTransform(
+                sprite.transform.x,
+                sprite.transform.y,
+                0,
+                1,
+                1,
+                0,
+                0
+            )
+        )
     end
 end
 

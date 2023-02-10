@@ -7,9 +7,6 @@ Map = {
 	object = sti("maps/arena1.lua"),
     layers = {}
 }
-Map.object:addCustomLayer("Enemies", 3)
-Map.layers.enemies = Map.object.layers["Enemies"]
-Map.layers.enemies.sprites = {}
 
 Map.init = function()
     for index, layer in pairs(Map.object.layers) do
@@ -40,36 +37,6 @@ Map.init = function()
             Map.object:removeLayer(index)
         end
     end
-
-    function Map.layers.enemies:update(dt)
-        for _, sprite in pairs(self.sprites) do
-        end
-    end
-
-    function Map.layers.enemies:draw()
-        for _, sprite in pairs(self.sprites) do
-            love.graphics.draw(
-                sprite.image,
-                sprite.animation,
-                love.math.newTransform(
-                    sprite.transform.x,
-                    sprite.transform.y,
-                    0,
-                    1,
-                    1,
-                    0,
-                    0
-                )
-            )
-        end
-    end
-end
-
-Map.addEnemy = function(enemy)
-    table.insert(
-        Map.layers.enemies.sprites,
-        enemy
-    )
 end
 
 Map.update = function()
