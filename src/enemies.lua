@@ -1,8 +1,7 @@
 require "src/camera"
+require "src/map"
 
 Enemies = {}
-
-Enemies.objects = {}
 Enemies.waves = {}
 Enemies.spawners = {
 	spawnSpeed = 500,
@@ -49,13 +48,6 @@ Enemies.types.enemy1.animation = love.graphics.newQuad(
 )
 Enemies.types.enemy1.spritesheet:setFilter("nearest", "nearest")
 
-Enemies.add = function(enemy)
-	table.insert(
-		Enemies.objects,
-		enemy
-	)
-end
-
 Enemies.addSpawner = function(spawner)
 	table.insert(
 		Enemies.spawners,
@@ -65,34 +57,25 @@ end
 
 Enemies.spawn = function()
 	local spawner = Enemies.getRandomSpawner()
-	local enemyInstance = Enemies.types.enemy1
+	local e = Enemies.types.enemy1
 
-	enemyInstance.transform.x = spawner.x
-	enemyInstance.transform.y = spawner.y
-
-	Enemies.add(enemyInstance)
+	e.transform.x = spawner.x
+	e.transform.y = spawner.y
+	
+	Map.addEnemy({
+        image = e.spritesheet,
+        animation = e.animation,
+        transform = {
+            x = e.transform.x,
+            y = e.transform.x,
+            w = e.transform.w,
+            h = e.transform.h
+        }
+	})
 end
 
 Enemies.getRandomSpawner = function()
 	return Enemies.spawners[math.random(#Enemies.spawners)]
-end
-
-Enemies.draw = function()
-    for index, e in pairs(Enemies.objects) do        
-        love.graphics.draw(
-            e.spritesheet,
-            e.animation,
-            love.math.newTransform(
-                Camera.offset.x - e.transform.x,
-                Camera.offset.y - e.transform.y,
-                e.transform.r,
-                Camera.scale,
-                Camera.scale,
-                e.transform.w,
-                e.transform.h
-            )
-        )
-    end
 end
 
 Enemies.update = function()
@@ -101,16 +84,13 @@ Enemies.update = function()
         Enemies.spawners.spawnTimer = Enemies.spawners.spawnTimer + 1
     else
         enemiesSize = 0
-        for _ in pairs(Enemies.objects) do enemiesSize = enemiesSize + 1 end
+        for _ in pairs(Map.layers.enemies.sprites) do enemiesSize = enemiesSize + 1 end
         if enemiesSize < Enemies.spawners.maxEnemies then
             Enemies.spawn()
             Enemies.spawners.spawnTimer = 0
         else
             Enemies.spawners.spawn = false
         end
-    end
-
-    for index, e in pairs(Enemies.objects) do
     end
 end
 

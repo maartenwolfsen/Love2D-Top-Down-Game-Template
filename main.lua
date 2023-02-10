@@ -2,11 +2,11 @@
 
 require "src/func"
 require "src/colliders"
-require "src/enemies"
 require "src/bullets"
 require "src/player"
 require "src/camera"
 require "src/map"
+require "src/enemies"
 if DEBUG then
     require "src/debug"
 end
@@ -34,7 +34,6 @@ end
 function love.draw()
     Map.draw()
     Bullets.draw()
-    Enemies.draw()
     Player.draw()
   
     if debug then
@@ -89,18 +88,9 @@ function love.mousepressed(x, y, button, istouch)
     end
     
     if Bullets.gun.can_shoot then
-        Bullets.shoot(
-            Camera,
-            {
-                x = Player.x,
-                y = Player.y,
-                h = Player.h,
-                w = Player.w
-            },
-            {
-                x = x,
-                y = y
-            }
-        )
+        Bullets.shoot({
+            x = x,
+            y = y
+        })
     end
 end

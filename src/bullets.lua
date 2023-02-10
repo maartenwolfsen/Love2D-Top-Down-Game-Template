@@ -1,3 +1,6 @@
+require "src/camera"
+require "src/player"
+
 Bullets = {}
 
 Bullets.gun = {
@@ -46,24 +49,27 @@ Bullets.draw = function()
     end
 end
 
-Bullets.shoot = function(camera, player, mousePos)
-    local delta = {
-        x = player.x - mousePos.x,
-        y = player.y - mousePos.y
-    }
-    
-    Bullets.add({
+Bullets.shoot = function(mousePos)
+    local b = {
         id = Bullets.gun.current_bullet_id,
         bullet = {
-            x = player.x + (player.w * camera.scale / 2),
-            y = player.y + (player.h * camera.scale / 2),
-            r = math.atan2(delta.x, delta.y),
+            start = {
+                x = Camera.x,
+                y = Camera.y
+            },
+            pos = {
+                x = Player.x + (Player.w * Camera.scale / 2),
+                y = Player.y + (Player.h * Camera.scale / 2)
+            },
+            r = math.atan2(Player.x - mousePos.x, Player.y - mousePos.y),
             w = 20,
             h = 3,
             destroy_timer_limit = 150,
             destroy_timer = 0
         }
-    })
+    }
+    
+    Bullets.add(b)
 
     Bullets.gun.current_bullet_id = Bullets.gun.current_bullet_id + 1
     Bullets.gun.can_shoot = false
@@ -80,10 +86,10 @@ Bullets.update = function()
     
     for index, b in pairs(Bullets.objects) do
         local bulletInstance = b.bullet
-        local x = bulletInstance.x + -math.sin(bulletInstance.r) * Bullets.gun.bullet_speed
-        local y = bulletInstance.y + -math.cos(bulletInstance.r) * Bullets.gun.bullet_speed
-        bulletInstance.x = x
-        bulletInstance.y = y
+        local x = bulletInstance.pos.x + -math.sin(bulletInstance.r) * Bullets.gun.bullet_speed
+        local y = bulletInstance.pos.y + -math.cos(bulletInstance.r) * Bullets.gun.bullet_speed
+        bulletInstance.pos.x = x
+        bulletInstance.pos.y = y
 
         bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
         
