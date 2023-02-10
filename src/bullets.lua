@@ -1,9 +1,10 @@
+require "src/func"
 require "src/camera"
 require "src/player"
 require "src/map"
 
 Bullets = {
-    bullet_speed = 4,
+    speed = 3,
     sprite = love.graphics.newImage("images/bullet.png"),
     current_bullet_id = 0,
     shoot_speed = 30,
@@ -35,9 +36,9 @@ Bullets.shoot = function(mousePos)
                 x = Camera.x,
                 y = Camera.y,
                 w = Bullets.sprite:getWidth(),
-                h = Bullets.sprite:getHeight()
+                h = Bullets.sprite:getHeight(),
+                r = math.atan2(Player.x - mousePos.x, Player.y - mousePos.y)
             },
-            r = math.atan2(Player.x - mousePos.x, Player.y - mousePos.y),
             destroy_timer_limit = 150,
             destroy_timer = 0
         }
@@ -49,28 +50,7 @@ Bullets.shoot = function(mousePos)
     love.audio.play(Bullets.sfx.shoot)
 end
 
-Bullets.update = function()
-    -- local count = 0
-    -- for _ in pairs(Bullets.objects) do count = count + 1 end
-
-    -- if count == 0 then
-    --     return
-    -- end
-    
-    -- for index, b in pairs(Bullets.objects) do
-    --     local bulletInstance = b.bullet
-    --     local x = bulletInstance.pos.x + -math.sin(bulletInstance.r) * Bullets.gun.bullet_speed
-    --     local y = bulletInstance.pos.y + -math.cos(bulletInstance.r) * Bullets.gun.bullet_speed
-    --     bulletInstance.pos.x = x
-    --     bulletInstance.pos.y = y
-
-    --     bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
-        
-    --     if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
-    --         table.remove(Bullets.objects, index)
-    --     end
-    -- end
-    
+Bullets.update = function()    
     if Bullets.can_shoot == false then
         if Bullets.shoot_timer > Bullets.shoot_speed then
             Bullets.can_shoot = true
@@ -82,7 +62,23 @@ Bullets.update = function()
 end
 
 function Map.layers.bullets:update(dt)
-    for _, sprite in pairs(self.sprites) do
+    for _, b in pairs(self.sprites) do
+        local bulletInstance = b.bullet
+
+        bulletInstance.transform.x =
+            bulletInstance.transform.x
+            + -math.sin(bulletInstance.transform.r)
+            * Bullets.speed
+        bulletInstance.transform.y =
+            bulletInstance.transform.y
+            + -math.cos(bulletInstance.transform.r)
+            * Bullets.speed
+
+        bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
+        
+        if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
+            table.remove(Map.layers.bullets.sprites, _)
+        end
     end
 end
 

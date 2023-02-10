@@ -26,7 +26,7 @@ Debug.draw = function()
         love.graphics.print(
             "  - Id: " ..tostring(b.id)..
                 "; Timer: " ..tostring(b.bullet.destroy_timer)..
-                "; R: " ..tostring(math.floor(math.deg(b.bullet.r))),
+                "; R: " ..tostring(math.floor(math.deg(b.bullet.transform.r))),
             10,
             130 + (index * 20)
         )

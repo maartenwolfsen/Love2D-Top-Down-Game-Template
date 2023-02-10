@@ -33,7 +33,6 @@ end
 
 function love.draw()
     Map.draw()
-    Bullets.draw()
     Player.draw()
   
     if debug then
@@ -87,7 +86,7 @@ function love.mousepressed(x, y, button, istouch)
         return
     end
     
-    if Bullets.gun.can_shoot then
+    if Bullets.can_shoot then
         Bullets.shoot({
             x = x,
             y = y
