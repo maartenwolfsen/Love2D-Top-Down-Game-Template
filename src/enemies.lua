@@ -105,7 +105,6 @@ Enemies.update = function()
     end
 end
 
-
 function Map.layers.enemies:update(dt)
     for _, sprite in pairs(self.sprites) do
     end

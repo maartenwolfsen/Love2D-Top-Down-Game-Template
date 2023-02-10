@@ -19,5 +19,16 @@ Debug.draw = function()
         ..tostring(Player.animations.current_animation_frame), 10, 70)
     love.graphics.print("Camera | Scale: " ..tostring(Camera.scale), 10, 90)
     love.graphics.print("Enemies | Timer: " ..tostring(Enemies.spawners.spawnTimer).. "; Count: " ..tostring(Func.getTableLength(Map.layers.enemies.sprites)), 10, 110)
-    love.graphics.print("Bullets: " ..tostring(Func.getTableLength(Bullets.objects)), 10, 130)
+    love.graphics.print("Bullets: " ..tostring(Func.getTableLength(Map.layers.bullets.sprites)), 10, 130)
+
+
+    for index, b in pairs(Map.layers.bullets.sprites) do
+        love.graphics.print(
+            "  - Id: " ..tostring(b.id)..
+                "; Timer: " ..tostring(b.bullet.destroy_timer)..
+                "; R: " ..tostring(math.floor(math.deg(b.bullet.r))),
+            10,
+            130 + (index * 20)
+        )
+    end
 end
