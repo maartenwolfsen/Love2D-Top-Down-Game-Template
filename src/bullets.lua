@@ -86,9 +86,6 @@ function Map.layers.bullets:draw()
     for _, sprite in pairs(self.sprites) do
         local b = sprite.bullet
 
-        print(b.transform.x)
-        print(b.transform.y)
-
         love.graphics.draw(
             Bullets.sprite,
             Bullets.animation,
