@@ -12,6 +12,7 @@ Enemies.spawners = {
 Enemies.types = {
 	enemy1 = {
 		spritesheet = love.graphics.newImage("images/enemy_spritesheet.png"),
+		health = 40,
 		transform = {
 			x = 0,
 			y = 0,
@@ -65,17 +66,21 @@ Enemies.spawn = function()
 
 	e.transform.x = spawner.x
 	e.transform.y = spawner.y
-	
-	Enemies.addEnemy({
+
+	local enemy = {
         image = e.spritesheet,
         animation = e.animation,
+        health = e.health,
         transform = {
             x = e.transform.x,
             y = e.transform.x,
             w = e.transform.w,
             h = e.transform.h
         }
-	})
+	}
+	enemy.collider = enemy.transform
+	
+	Enemies.addEnemy(enemy)
 end
 
 Enemies.addEnemy = function(enemy)
@@ -107,6 +112,17 @@ end
 
 function Map.layers.enemies:update(dt)
     for _, sprite in pairs(self.sprites) do
+    	for index, b in pairs(Map.layers.bullets.sprites) do
+    		if Colliders.isCollidingWith(sprite.collider, b.collider) then
+    			sprite.health = sprite.health - Bullets.damage
+
+    			if sprite.health <= 0 then
+    				table.remove(Map.layers.enemies.sprites, _)
+    			end
+
+            	table.remove(Map.layers.bullets.sprites, index)
+    		end
+    	end
     end
 end
 

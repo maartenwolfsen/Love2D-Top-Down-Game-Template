@@ -10,6 +10,7 @@ Bullets = {
     shoot_speed = 30,
     shoot_timer = 0,
     can_shoot = true,
+    damage = 10,
     sfx = {
         shoot = love.audio.newSource("sfx/laserShoot.wav", "static")
     }
@@ -42,6 +43,14 @@ Bullets.shoot = function(mousePos)
             destroy_timer_limit = 150,
             destroy_timer = 0
         }
+    }
+
+    local t = b.bullet.transform
+    b.collider = {
+        x = t.x,
+        y = t.y,
+        w = t.w,
+        h = t.h
     }
     
     Bullets.add(b)
@@ -79,6 +88,9 @@ function Map.layers.bullets:update(dt)
         if bulletInstance.destroy_timer > bulletInstance.destroy_timer_limit then
             table.remove(Map.layers.bullets.sprites, _)
         end
+
+        b.collider.x = bulletInstance.transform.x
+        b.collider.y = bulletInstance.transform.y
     end
 end
 
