@@ -21,8 +21,8 @@ Camera.update = function()
     newPos = {
         x = Camera.x,
         y = Camera.y,
-        w = Player.w,
-        h = Player.h
+        w = Player.transform.w,
+        h = Player.transform.h
     }
     
     if love.keyboard.isDown("w") or love.keyboard.isDown("up") then

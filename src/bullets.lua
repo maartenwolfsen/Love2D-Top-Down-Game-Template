@@ -38,7 +38,7 @@ Bullets.shoot = function(mousePos)
                 y = Camera.y,
                 w = Bullets.sprite:getWidth(),
                 h = Bullets.sprite:getHeight(),
-                r = math.atan2(Player.x - mousePos.x, Player.y - mousePos.y)
+                r = math.atan2(Player.transform.x - mousePos.x, Player.transform.y - mousePos.y)
             },
             destroy_timer_limit = 150,
             destroy_timer = 0

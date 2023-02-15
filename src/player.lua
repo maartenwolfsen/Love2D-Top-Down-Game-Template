@@ -3,10 +3,12 @@ require "src/camera"
 
 Player = {
     spriteSheet = love.graphics.newImage("images/player_spritesheet.png"),
-    x = 0,
-    y = 0,
-    w = 16,
-    h = 16,
+    transform = {
+        x = 0,
+        y = 0,
+        w = 16,
+        h = 16
+    },
     animations = {
         animation_speed = 20,
         animation_timer = 0,
@@ -38,13 +40,13 @@ Player.spriteSheet:setFilter("nearest", "nearest")
 
 Player.draw = function()
     transform = love.math.newTransform(
-        Player.x,
-        Player.y,
+        Player.transform.x,
+        Player.transform.y,
         Camera.r,
         Camera.scale,
         Camera.scale,
-        Player.w / (Camera.scale ^ 2),
-        Player.h / (Camera.scale ^ 2)
+        Player.transform.w / (Camera.scale ^ 2),
+        Player.transform.h / (Camera.scale ^ 2)
     )
     
     love.graphics.draw(
@@ -55,8 +57,8 @@ Player.draw = function()
 end
 
 Player.update = function()
-    Player.x = (window.w / 2) - ((Player.w * Camera.scale) / 2)
-    Player.y = (window.h / 2) - ((Player.h * Camera.scale) / 2)
+    Player.transform.x = (window.w / 2) - ((Player.transform.w * Camera.scale) / 2)
+    Player.transform.y = (window.h / 2) - ((Player.transform.h * Camera.scale) / 2)
 
     Player.updateAnimation()
 end
@@ -128,10 +130,10 @@ Player.updateAnimation = function()
 
     -- Create animation quad
     Player.animation = love.graphics.newQuad(
-        currentFrameLocation.x * Player.w,
-        currentFrameLocation.y * Player.h,
-        Player.w,
-        Player.h,
+        currentFrameLocation.x * Player.transform.w,
+        currentFrameLocation.y * Player.transform.h,
+        Player.transform.w,
+        Player.transform.h,
         Player.spriteSheet
     )
 end
