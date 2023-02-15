@@ -22,7 +22,6 @@ Debug.draw = function()
         "/" ..tostring(Enemies.spawners.spawnSpeed), 10, 230)
     love.graphics.print("Bullets: " ..tostring(Func.getTableLength(Map.layers.bullets.sprites)), 10, 130)
 
-
     for index, e in pairs(Map.layers.enemies.sprites) do
         love.graphics.print(
                 "Health: " ..tostring(e.health)..
