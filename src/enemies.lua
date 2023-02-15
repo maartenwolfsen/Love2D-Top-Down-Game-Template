@@ -1,5 +1,6 @@
 require "src/camera"
 require "src/map"
+require "src/data/enemies"
 
 Enemies = {}
 Enemies.waves = {}
@@ -9,45 +10,14 @@ Enemies.spawners = {
 	maxEnemies = 10,
 	spawn = true
 }
-Enemies.types = {
-	enemy1 = {
-		spritesheet = love.graphics.newImage("images/enemy_spritesheet.png"),
-		health = 40,
-		transform = {
-			x = 0,
-			y = 0,
-			w = 12,
-			h = 12,
-			r = 0
-		},
-		animations = {
-	        animation_speed = 20,
-	        animation_timer = 0,
-	        current_animation = "walk_right",
-	        current_animation_frame = 0,
-	        walk_right = {
-	            {x = 0, y = 0},
-	            {x = 1, y = 0},
-	            {x = 2, y = 0},
-	            {x = 3, y = 0}
-	        },
-	        walk_left = {
-	            {x = 0, y = 1},
-	            {x = 1, y = 1},
-	            {x = 2, y = 1},
-	            {x = 3, y = 1}
-	        }
-		}
-	}
-}
-Enemies.types.enemy1.animation = love.graphics.newQuad(
+EnemyData.enemy1.animation = love.graphics.newQuad(
 	0,
 	0,
-	Enemies.types.enemy1.transform.w,
-	Enemies.types.enemy1.transform.h,
-	Enemies.types.enemy1.spritesheet
+	EnemyData.enemy1.transform.w,
+	EnemyData.enemy1.transform.h,
+	EnemyData.enemy1.spritesheet
 )
-Enemies.types.enemy1.spritesheet:setFilter("nearest", "nearest")
+EnemyData.enemy1.spritesheet:setFilter("nearest", "nearest")
 
 Map.object:addCustomLayer("Enemies", 3)
 Map.layers.enemies = Map.object.layers["Enemies"]
@@ -62,7 +32,7 @@ end
 
 Enemies.spawn = function()
 	local spawner = Enemies.getRandomSpawner()
-	local e = Enemies.types.enemy1
+	local e = EnemyData.enemy1
 
 	e.transform.x = spawner.x
 	e.transform.y = spawner.y
