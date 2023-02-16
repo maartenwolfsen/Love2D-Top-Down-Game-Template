@@ -8,8 +8,8 @@ Debug = {}
 Debug.draw = function()
     love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
     love.graphics.print("Player position: {x: "
-        ..tostring(math.floor(Camera.x)).. "; y: "
-        ..tostring(math.floor(Camera.y)).. "}", 10, 30)
+        ..tostring(math.floor(Camera.transform.x)).. "; y: "
+        ..tostring(math.floor(Camera.transform.y)).. "}", 10, 30)
     love.graphics.print("Map position: {x: "
         ..tostring(math.floor(Camera.offset.x)).. "; y: "
         ..tostring(math.floor(Camera.offset.y)).. "}", 10, 50)

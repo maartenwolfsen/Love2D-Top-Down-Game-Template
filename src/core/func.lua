@@ -25,4 +25,11 @@ Func.moveForward = function(transform, speed)
     return transform
 end
 
+Func.screenToWorldTransform = function(transform)
+    transform.x = Camera.offset.x + transform.x
+    transform.y = Camera.offset.y + transform.y
+
+    return transform
+end
+
 return Func

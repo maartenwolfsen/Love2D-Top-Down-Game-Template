@@ -1,9 +1,11 @@
 require "src/colliders"
 
 Camera = {
-    x = 0,
-    y = 0,
-    r = 0,
+    transform = {
+        x = 0,
+        y = 0,
+        r = 0
+    },
     scale = 4,
     minScale = 4,
     zoom = 0,
@@ -19,31 +21,31 @@ Camera = {
 
 Camera.update = function()
     newPos = {
-        x = Camera.x,
-        y = Camera.y,
+        x = Camera.transform.x,
+        y = Camera.transform.y,
         w = Player.transform.w,
         h = Player.transform.h
     }
     
     if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-        newPos.y = Camera.y - Camera.speed
+        newPos.y = Camera.transform.y - Camera.speed
     end
 
     if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
-        newPos.y = Camera.y + Camera.speed
+        newPos.y = Camera.transform.y + Camera.speed
     end
 
     if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-        newPos.x = Camera.x - Camera.speed
+        newPos.x = Camera.transform.x - Camera.speed
     end
 
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-        newPos.x = Camera.x + Camera.speed
+        newPos.x = Camera.transform.x + Camera.speed
     end
     
     if not Colliders.isColliding(newPos) then
-        Camera.x = newPos.x
-        Camera.y = newPos.y
+        Camera.transform.x = newPos.x
+        Camera.transform.y = newPos.y
     end
 
     if love.mouse.isDown(2) then
@@ -62,6 +64,6 @@ Camera.update = function()
 end
 
 Camera.updateOffset = function()
-    Camera.offset.x = -Camera.x + window.w / Camera.scale / 2
-    Camera.offset.y = -Camera.y + window.h / Camera.scale / 2
+    Camera.offset.x = -Camera.transform.x + window.w / Camera.scale / 2
+    Camera.offset.y = -Camera.transform.y + window.h / Camera.scale / 2
 end

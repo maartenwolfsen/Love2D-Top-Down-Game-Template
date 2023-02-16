@@ -41,6 +41,7 @@ Enemies.spawn = function()
         image = e.spritesheet,
         animation = e.animation,
         health = e.health,
+        speed = e.speed,
         transform = {
             x = e.transform.x,
             y = e.transform.x,
@@ -93,6 +94,16 @@ function Map.layers.enemies:update(dt)
             	table.remove(Map.layers.bullets.sprites, index)
     		end
     	end
+
+    	local transform = sprite.transform
+    	transform.r = Func.getAngleOfTwoPoints(
+    		sprite.transform,
+    		Camera.transform
+    	)
+    	sprite.transform = Func.moveForward(
+    		transform,
+	    	sprite.speed / 10
+		)
     end
 end
 

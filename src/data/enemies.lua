@@ -2,6 +2,7 @@ EnemyData = {
 	enemy1 = {
 		spritesheet = love.graphics.newImage("images/enemy_spritesheet.png"),
 		health = 40,
+		speed = 3,
 		transform = {
 			x = 0,
 			y = 0,

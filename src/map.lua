@@ -14,8 +14,8 @@ Map.init = function()
             if layer.name == "Spawners" then
                 for objIndex, object in pairs(layer.objects) do
                     if object.name == "Player" then
-                        Camera.x = object.x
-                        Camera.y = object.y
+                        Camera.transform.x = object.x
+                        Camera.transform.y = object.y
                     elseif object.name == "Enemy" then
                         Enemies.addSpawner({
                             x = object.x,
