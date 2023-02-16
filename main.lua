@@ -1,6 +1,6 @@
 ﻿local DEBUG = true
 
-require "src/func"
+require "src/core/func"
 require "src/colliders"
 require "src/bullets"
 require "src/player"

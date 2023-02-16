@@ -1,4 +1,4 @@
-require "src/func"
+require "src/core/func"
 require "src/camera"
 
 Player = {

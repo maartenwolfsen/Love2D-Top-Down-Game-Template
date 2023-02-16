@@ -1,5 +1,5 @@
 local sti = require "lib/sti"
-require "src/func"
+require "src/core/func"
 require "src/camera"
 require "src/colliders"
 

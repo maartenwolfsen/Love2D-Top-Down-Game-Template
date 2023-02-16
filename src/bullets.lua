@@ -1,4 +1,4 @@
-require "src/func"
+require "src/core/func"
 require "src/camera"
 require "src/player"
 require "src/map"
@@ -38,7 +38,10 @@ Bullets.shoot = function(mousePos)
                 y = Camera.y,
                 w = Bullets.sprite:getWidth(),
                 h = Bullets.sprite:getHeight(),
-                r = math.atan2(Player.transform.x - mousePos.x, Player.transform.y - mousePos.y)
+                r = Func.getAngleOfTwoPoints(
+                    Player.transform,
+                    mousePos
+                )
             },
             destroy_timer_limit = 150,
             destroy_timer = 0
@@ -73,15 +76,11 @@ end
 function Map.layers.bullets:update(dt)
     for _, b in pairs(self.sprites) do
         local bulletInstance = b.bullet
-
-        bulletInstance.transform.x =
-            bulletInstance.transform.x
-            + -math.sin(bulletInstance.transform.r)
-            * Bullets.speed
-        bulletInstance.transform.y =
-            bulletInstance.transform.y
-            + -math.cos(bulletInstance.transform.r)
-            * Bullets.speed
+        
+        bulletInstance.transform = Func.moveForward(
+            bulletInstance.transform,
+            Bullets.speed
+        )
 
         bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
         
