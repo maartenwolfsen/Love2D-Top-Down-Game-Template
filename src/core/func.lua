@@ -15,12 +15,22 @@ Func.getAngleOfTwoPoints = function(t1, t2)
 end
 
 Func.moveForward = function(transform, speed)
-    transform.x = transform.x
-        + -math.sin(transform.r)
-        * speed
-    transform.y = transform.y
-        + -math.cos(transform.r)
-        * speed
+    local newTransform = {
+        x = transform.x
+            + -math.sin(transform.r)
+            * speed,
+        y = transform.y
+            + -math.cos(transform.r)
+            * speed,
+        w = transform.w,
+        h = transform.h
+    }
+
+    if Colliders.isColliding(newTransform) then
+        return transform
+    end
+
+    transform = newTransform
 
     return transform
 end
