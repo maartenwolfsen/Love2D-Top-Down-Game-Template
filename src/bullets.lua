@@ -79,7 +79,8 @@ function Map.layers.bullets:update(dt)
         
         bulletInstance.transform = Func.moveForward(
             bulletInstance.transform,
-            Bullets.speed
+            Bullets.speed,
+            true
         )
 
         bulletInstance.destroy_timer = bulletInstance.destroy_timer + 1
