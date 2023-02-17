@@ -1,4 +1,5 @@
 require "src/colliders"
+require "src/core/window"
 
 Camera = {
     transform = {
@@ -79,6 +80,6 @@ Camera.update = function()
 end
 
 Camera.updateOffset = function()
-    Camera.offset.x = -Camera.transform.x + window.w / Camera.scale / 2
-    Camera.offset.y = -Camera.transform.y + window.h / Camera.scale / 2
+    Camera.offset.x = -Camera.transform.x + Window.w / Camera.scale / 2
+    Camera.offset.y = -Camera.transform.y + Window.h / Camera.scale / 2
 end

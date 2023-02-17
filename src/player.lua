@@ -1,4 +1,6 @@
 require "src/core/func"
+require "src/core/window"
+require "src/game"
 require "src/camera"
 
 Player = {
@@ -61,8 +63,8 @@ Player.draw = function()
 end
 
 Player.update = function()
-    Player.transform.x = (window.w / 2) - ((Player.transform.w * Camera.scale) / 2)
-    Player.transform.y = (window.h / 2) - ((Player.transform.h * Camera.scale) / 2)
+    Player.transform.x = (Window.w / 2) - ((Player.transform.w * Camera.scale) / 2)
+    Player.transform.y = (Window.h / 2) - ((Player.transform.h * Camera.scale) / 2)
 
     Player.updateAnimation()
 
@@ -165,9 +167,15 @@ Player.hit = function(damage)
     Player.invincible = true
     Player.health = Player.health - damage
 
-    if Player.health < 0 then
-        Player.health = 0
+    if Player.health <= 0 then
+        Player.death()
     end
+end
+
+Player.death = function()
+    Player.health = 0
+    Map.layers.enemies.sprites = {}
+    Game.run = false
 end
 
 return Player

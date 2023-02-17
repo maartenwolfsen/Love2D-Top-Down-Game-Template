@@ -1,0 +1,3 @@
+Game = {
+	run = true
+}
