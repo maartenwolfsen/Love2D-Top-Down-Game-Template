@@ -62,7 +62,7 @@ Bullets.shoot = function(mousePos)
     love.audio.play(Bullets.sfx.shoot)
 end
 
-Bullets.update = function()    
+Bullets.update = function()
     if Bullets.can_shoot == false then
         if Bullets.shoot_timer > Bullets.shoot_speed then
             Bullets.can_shoot = true

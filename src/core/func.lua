@@ -23,7 +23,8 @@ Func.moveForward = function(transform, speed)
             + -math.cos(transform.r)
             * speed,
         w = transform.w,
-        h = transform.h
+        h = transform.h,
+        r = transform.r
     }
 
     if Colliders.isColliding(newTransform) then

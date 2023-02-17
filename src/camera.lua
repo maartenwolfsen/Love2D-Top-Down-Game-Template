@@ -42,11 +42,26 @@ Camera.update = function()
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
         newPos.x = Camera.transform.x + Camera.speed
     end
-    
-    if not Colliders.isColliding(newPos) then
-        Camera.transform.x = newPos.x
-        Camera.transform.y = newPos.y
+
+    local newPosX, newPosY = {
+        x = newPos.x,
+        y = Camera.transform.y,
+        w = newPos.w,
+        h = newPos.h
+    }, {
+        x = Camera.transform.x,
+        y = newPos.y,
+        w = newPos.w,
+        h = newPos.h
+    }
+
+    if Colliders.isColliding(newPosX) then
+        newPos.x = Camera.transform.x
+    elseif Colliders.isColliding(newPosY) then
+        newPos.y = Camera.transform.y
     end
+
+    Camera.transform = newPos
 
     if love.mouse.isDown(2) then
         if Camera.zoom < Camera.maxZoom then
