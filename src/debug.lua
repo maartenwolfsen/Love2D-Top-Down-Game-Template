@@ -6,21 +6,22 @@ require "src/bullets"
 Debug = {}
 
 Debug.draw = function()
-    love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 10)
+    love.graphics.print("FPS: " ..tostring(love.timer.getFPS( )), 10, 100)
     love.graphics.print("Player position: {x: "
         ..tostring(math.floor(Camera.transform.x)).. "; y: "
-        ..tostring(math.floor(Camera.transform.y)).. "}", 10, 30)
+        ..tostring(math.floor(Camera.transform.y)).. "} | Health: "
+        ..tostring(Player.health), 10, 130)
     love.graphics.print("Map position: {x: "
         ..tostring(math.floor(Camera.offset.x)).. "; y: "
-        ..tostring(math.floor(Camera.offset.y)).. "}", 10, 50)
+        ..tostring(math.floor(Camera.offset.y)).. "}", 10, 150)
     love.graphics.print("Animation | Anim: "
         ..Player.animations.current_animation.. "; Timer: "
         ..tostring(Player.animations.animation_timer).. "; Frame: "
-        ..tostring(Player.animations.current_animation_frame), 10, 70)
-    love.graphics.print("Camera | Scale: " ..tostring(Camera.scale), 10, 90)
+        ..tostring(Player.animations.current_animation_frame), 10, 170)
+    love.graphics.print("Camera | Scale: " ..tostring(Camera.scale), 10, 190)
     love.graphics.print("Enemies | Timer: " ..tostring(Enemies.spawners.spawnTimer)..
-        "/" ..tostring(Enemies.spawners.spawnSpeed), 10, 230)
-    love.graphics.print("Bullets: " ..tostring(Func.getTableLength(Map.layers.bullets.sprites)), 10, 130)
+        "/" ..tostring(Enemies.spawners.spawnSpeed), 10, 330)
+    love.graphics.print("Bullets: " ..tostring(Func.getTableLength(Map.layers.bullets.sprites)), 10, 230)
 
     for index, e in pairs(Map.layers.enemies.sprites) do
         love.graphics.print(
@@ -28,7 +29,7 @@ Debug.draw = function()
                 " Collider: {x: " ..tostring(math.floor(e.collider.x))..
                 ", y: " ..tostring(math.floor(e.collider.y)).. "}",
             10,
-            230 + (index * 20)
+            330 + (index * 20)
         )
     end
 
@@ -40,7 +41,7 @@ Debug.draw = function()
                 "; Collider: {x: " ..tostring(math.floor(b.collider.x))..
                 ", y: " ..tostring(math.floor(b.collider.y)).. "}",
             10,
-            130 + (index * 20)
+            230 + (index * 20)
         )
     end
 end

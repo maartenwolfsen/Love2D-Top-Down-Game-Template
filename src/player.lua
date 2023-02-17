@@ -33,7 +33,11 @@ Player = {
             {x = 0, y = 4},
             {x = 1, y = 4}
         }
-    }
+    },
+    health = 100,
+    invincible = false,
+    invincibility_frames = 100,
+    invincibility_frame = 0
 }
 Player.animation = love.graphics.newQuad(0, 0, 16, 16, Player.spriteSheet)
 Player.spriteSheet:setFilter("nearest", "nearest")
@@ -61,6 +65,15 @@ Player.update = function()
     Player.transform.y = (window.h / 2) - ((Player.transform.h * Camera.scale) / 2)
 
     Player.updateAnimation()
+
+    if Player.invincible then
+        if Player.invincibility_frame > Player.invincibility_frames then
+            Player.invincibility_frame = 0
+            Player.invincible = false
+        else
+            Player.invincibility_frame = Player.invincibility_frame + 1
+        end
+    end
 end
 
 Player.updateAnimation = function()
@@ -146,6 +159,15 @@ Player.setAnimation = function(animation)
     Player.animations.current_animation = animation
     Player.animations.animation_timer = 0
     Player.animations.current_animation_frame = 0
+end
+
+Player.hit = function(damage)
+    Player.invincible = true
+    Player.health = Player.health - damage
+
+    if Player.health < 0 then
+        Player.health = 0
+    end
 end
 
 return Player

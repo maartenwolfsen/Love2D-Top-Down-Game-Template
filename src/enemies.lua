@@ -42,6 +42,7 @@ Enemies.spawn = function()
         animation = e.animation,
         health = e.health,
         speed = e.speed,
+        damage = e.damage,
         transform = {
             x = e.transform.x,
             y = e.transform.x,
@@ -95,6 +96,20 @@ function Map.layers.enemies:update(dt)
     		end
     	end
 
+        if Colliders.isCollidingWith(
+            sprite.collider,
+            {
+                x = Camera.transform.x,
+                y = Camera.transform.y,
+                w = Player.transform.w,
+                h = Player.transform.h
+            }
+        ) then
+            if not Player.invincible then
+                Player.hit(sprite.damage)
+            end
+        end
+
     	local transform = sprite.transform
     	transform.r = Func.getAngleOfTwoPoints(
     		sprite.transform,
@@ -104,6 +119,8 @@ function Map.layers.enemies:update(dt)
     		transform,
 	    	sprite.speed / 10
 		)
+        sprite.collider.x = sprite.transform.x
+        sprite.collider.y = sprite.transform.y
     end
 end
 
