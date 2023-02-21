@@ -25,11 +25,10 @@ Ui.drawDeathScreen = function()
 	love.graphics.setColor(0,0,0,0.5)
 	love.graphics.rectangle("fill", 0, 0, Window.w, Window.h)
 	love.graphics.setColor(255,255,255)
-	love.graphics.setFont(Ui.font)
   	love.graphics.print(
   		Ui.deathText,
   		Window.w / 2,
-  		Window.h / 2,
+  		Window.h / 2 - 20,
   		0,
   		1,
   		1,
@@ -40,7 +39,7 @@ Ui.drawDeathScreen = function()
   	love.graphics.print(
   		finalScore,
   		Window.w / 2,
-  		Window.h / 2 + 40,
+  		Window.h / 2 + 20,
   		0,
   		1,
   		1,
