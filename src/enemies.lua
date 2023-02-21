@@ -82,6 +82,11 @@ Enemies.update = function()
     end
 end
 
+Enemies.death = function(index)
+    Game.addScore(10)
+    table.remove(Map.layers.enemies.sprites, index)
+end
+
 function Map.layers.enemies:update(dt)
     for _, sprite in pairs(self.sprites) do
     	for index, b in pairs(Map.layers.bullets.sprites) do
@@ -89,7 +94,7 @@ function Map.layers.enemies:update(dt)
     			sprite.health = sprite.health - Bullets.damage
 
     			if sprite.health <= 0 then
-    				table.remove(Map.layers.enemies.sprites, _)
+                    Enemies.death(_)
     			end
 
             	table.remove(Map.layers.bullets.sprites, index)
