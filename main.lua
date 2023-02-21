@@ -1,12 +1,14 @@
 ﻿local DEBUG = true
 
 require "src/core/func"
+require "src/game"
 require "src/colliders"
 require "src/bullets"
 require "src/player"
 require "src/camera"
 require "src/map"
 require "src/enemies"
+require "src/ui"
 if DEBUG then
     require "src/debug"
 end
@@ -14,16 +16,14 @@ end
 local TICKRATE = 1/144
 
 function love.load()
-    window = {
-        w = love.graphics.getWidth(),
-        h = love.graphics.getHeight()
-    }
-    
     Map.init()
-    font = love.graphics.getFont()
 end
 
 function love.update(dt)
+    if not Game.run then
+        return
+    end
+
     Camera.update()
     Player.update()
     Enemies.update()
@@ -33,7 +33,15 @@ end
 
 function love.draw()
     Map.draw()
+
+    if not Game.run then
+        Ui.drawDeathScreen()
+
+        return
+    end
+    
     Player.draw()
+    Ui.draw()
   
     if debug then
         Debug.draw()
@@ -82,7 +90,7 @@ function love.run()
 end
 
 function love.mousepressed(x, y, button, istouch)
-    if button ~= 1 then
+    if button ~= 1 or not Game.run then
         return
     end
     
