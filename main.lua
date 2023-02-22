@@ -1,4 +1,4 @@
-﻿local DEBUG = true
+﻿local DEBUG = false
 
 require "src/core/func"
 require "src/game"
@@ -43,7 +43,7 @@ function love.draw()
     Player.draw()
     Ui.draw()
   
-    if debug then
+    if DEBUG then
         Debug.draw()
     end
 end

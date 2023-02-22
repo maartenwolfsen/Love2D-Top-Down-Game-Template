@@ -54,7 +54,7 @@ Player.draw = function()
         Player.transform.w / (Camera.scale ^ 2),
         Player.transform.h / (Camera.scale ^ 2)
     )
-    
+
     love.graphics.draw(
         Player.spriteSheet,
         Player.animation,
@@ -100,7 +100,7 @@ Player.updateAnimation = function()
     else
         Player.setAnimation("idle")
     end
-    
+
     -- Update animation frame
     local count = 0
     if playerAnimations.current_animation == "idle" then
@@ -114,11 +114,11 @@ Player.updateAnimation = function()
     elseif playerAnimations.current_animation == "walk_left" then
         count = Func.getTableLength(playerAnimations.walk_left)
     end
-    
+
     local timer = Player.animations.animation_timer
     if (timer > playerAnimations.animation_speed) then
         playerAnimations.animation_timer = 0
-        
+
         frame = playerAnimations.current_animation_frame
         if (frame >= count - 1) then
             playerAnimations.current_animation_frame = 0
@@ -128,11 +128,11 @@ Player.updateAnimation = function()
     else
         playerAnimations.animation_timer = timer + 1
     end
-    
+
     -- Update animation
     local currentFrameIndex = playerAnimations.current_animation_frame + 1
     local currentFrameLocation = playerAnimations.idle[currentFrameIndex]
-    
+
     if playerAnimations.current_animation == "walk_up" then
         currentFrameLocation = playerAnimations.walk_up[currentFrameIndex]
     elseif playerAnimations.current_animation == "walk_right" then
@@ -157,7 +157,7 @@ Player.setAnimation = function(animation)
     if (Player.animations.current_animation == animation) then
         return
     end
-    
+
     Player.animations.current_animation = animation
     Player.animations.animation_timer = 0
     Player.animations.current_animation_frame = 0
